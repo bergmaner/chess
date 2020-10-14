@@ -9,7 +9,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(34, 34, 34);
+  background: #BECE9F;
 `;
 
 const BoardContainer = styled.div`

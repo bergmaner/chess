@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const Piece = styled.div`
-    background: ${props => props.black ? "#000" : "#FFF"};
+    background: ${props => props.black ? "#6F8F72" : "#ADBD8F"};
     width: 75px;
     height: 75px;
 `;
