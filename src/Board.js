@@ -2,6 +2,7 @@ import React from "react";
 import BoardSquare from "./BoardSquare";
 import styled from "styled-components";
 import { isBlack } from "./helpers";
+import { getPosition } from "./helpers";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -19,8 +20,12 @@ const Board = ({ board }) => {
   return (
     <BoardContainer>
       {board.flat().map((piece, i) => (
-        <SquareContainer>
-          <BoardSquare piece={piece} black={isBlack(i)} />
+        <SquareContainer key={i}>
+          <BoardSquare
+            piece={piece}
+            black={isBlack(i)}
+            position={getPosition(i)}
+          />
         </SquareContainer>
       ))}
     </BoardContainer>

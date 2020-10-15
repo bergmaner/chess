@@ -16,18 +16,21 @@ const PieceContainer = styled.div`
 `;
 
 
-const Piece = ({ piece: { type, color } }) => {
+const Piece = ({ piece: { type, color },position }) => {
   const pieceIndex = `${type}_${color}`;
   const pieceImg = require(`./assets/${pieceIndex}.png`);
   const [{ isDragging }, drag, preview] = useDrag({
+  
     item: {
       type: 'piece',
-      id: pieceIndex,
+      id: `${position}_${type}_${color}`,
     },
     collect: (monitor) => {
       return { isDragging: !!monitor.isDragging() }
     },
   })
+
+console.log(position);
 
   return (
       <>
