@@ -1,16 +1,14 @@
-import React from "react";
+import React, {useState} from "react";
 import Square from "./Square";
 import Piece from "./Piece";
 import { useDrop } from "react-dnd";
-import { move } from "./Game";
+import {  move } from "./Game";
 
-const BoardSquare = ({ piece, black, position }) => {
-  console.log(position, "dd")
+const BoardSquare = ({ piece, black, position, moves, setMoves }) => {
   const [, drop] = useDrop({
     accept: "piece",
     drop: (item) => {
       const [fromPosition] = item.id.split('_');
-      console.log(item.id,'dd');
       move(fromPosition, position);
     },
   });
@@ -18,7 +16,7 @@ const BoardSquare = ({ piece, black, position }) => {
   return (
     <div ref={drop}>
       <Square black={black}>
-        {piece && <Piece piece={piece} position={position}></Piece>}
+        { <Piece piece={piece} position={position} moves={moves} setMoves={setMoves}></Piece>}
       </Square>
     </div>
   );

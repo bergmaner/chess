@@ -1,6 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
+import {getAvaibleMoves} from "./Game"
 import { useDrag, DragPreviewImage } from "react-dnd";
+import { isAvaibleMove } from "./Game";
 import styled from "styled-components";
+
+const Container = styled.div`
+  height: 75px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Circle = styled.div`
+  background: green;
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+`;
 
 const PieceContainer = styled.div`
   cursor: grab;
@@ -9,37 +25,48 @@ const PieceContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: ${props => props.isDragging ? 0 :1};
+  opacity: ${(props) => (props.isDragging ? 0 : 1)};
   img {
     height: 70%;
   }
+  ::before{
+    content: '';
+    position: absolute;
+    background: green;
+    width: ${ props => props.isAvaible && '16px'};
+    height: ${ props => props.isAvaible && '16px'};
+    border-radius: 16px;
+  }
 `;
 
+const Piece = ({ piece, position, moves, setMoves }) => {
 
-const Piece = ({ piece: { type, color },position }) => {
-  const pieceIndex = `${type}_${color}`;
-  const pieceImg = require(`./assets/${pieceIndex}.png`);
+  const pieceIndex = piece && `${piece.type}_${piece.color}`;
+  const pieceImg = piece && require(`./assets/${pieceIndex}.png`);
   const [{ isDragging }, drag, preview] = useDrag({
-  
     item: {
-      type: 'piece',
-      id: `${position}_${type}_${color}`,
+      type: "piece",
+      id: piece && `${position}_${piece.type}_${piece.color}`,
     },
     collect: (monitor) => {
-      return { isDragging: !!monitor.isDragging() }
+      return { isDragging: !!monitor.isDragging() };
     },
-  })
+  });
 
-console.log(position);
+  useEffect(() => {
+    isDragging ? setMoves(getAvaibleMoves(position)) : setMoves([]);
+  }, [isDragging]);
 
   return (
-      <>
-    <DragPreviewImage connect={preview} src={pieceImg} />
-      <PieceContainer isDragging={isDragging} ref={drag}>
-        <img src={pieceImg} alt=""  />
+    piece ?
+    <>
+      <DragPreviewImage connect={preview} src={pieceImg} />
+      <PieceContainer isAvaible={isAvaibleMove(moves, position)} isDragging={isDragging} ref={drag}>
+        <img src={pieceImg} alt="" />
       </PieceContainer>
-</>
-
+    </>
+    : 
+    isAvaibleMove(moves, position) && <Container><Circle/></Container>
   );
 };
 
