@@ -1,6 +1,5 @@
 import * as Chess from "chess.js";
 import { BehaviorSubject } from "rxjs";
-import { getPosition } from "./helpers";
 
 const chess = new Chess();
 
@@ -10,12 +9,15 @@ export const gameSubject = new BehaviorSubject({
 
 export const move = (from, to, setTurn) => {
   const legalMove = chess.move({ from, to });
-  console.log(legalMove, "hh");
+
   if (legalMove) {
     gameSubject.next({ board: chess.board() });
-    let color = legalMove.color === "b" ? "w" : "b";
-    console.log("color", color)
   }
+};
+
+export const getCurrentTurn = () => {
+  if (chess.history().length % 2 === 0) return "w";
+  return "b";
 };
 
 export const getAvaibleMoves = (position) => {
@@ -29,18 +31,29 @@ export const isAvaibleMove = (moves, position) => {
   moves &&
     moves.forEach((move) => {
       let tempMove = move;
-     
-      if (tempMove.lastIndexOf('+') !== -1 ) 
-        tempMove = tempMove.substring(tempMove.length - 3, tempMove.length - 1);
-      else if (tempMove.length > 2 && tempMove !== "O-O")
-        tempMove = tempMove.substring(tempMove.length - 2, tempMove.length);
 
+      if (tempMove.lastIndexOf("+") !== -1)
+        tempMove = tempMove.substring(tempMove.length - 3, tempMove.length - 1);
+      else if (tempMove.length > 2 && (tempMove !== "O-O" && tempMove !== "O-O-O") )
+        tempMove = tempMove.substring(tempMove.length - 2, tempMove.length);
 
       if (tempMove === position) {
         isAvaible = true;
       }
-      if(tempMove === "O-O" && position[0] ==="g" && (position[1] === "1" || position[1] === "8")){
-        isAvaible = true;
+      if (tempMove === "O-O" && position[0] === "g") {
+        if (
+          (position[1] === "1" && getCurrentTurn() === "w") ||
+          (position[1] === "8" && getCurrentTurn() === "b")
+        )
+          isAvaible = true;
+      }
+      
+      if (tempMove === "O-O-O" && position[0] === "c") {
+        if (
+          (position[1] === "1" && getCurrentTurn() === "w") ||
+          (position[1] === "8" && getCurrentTurn() === "b")
+        )
+          isAvaible = true;
       }
     });
 
