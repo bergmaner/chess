@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {getAvaibleMoves} from "./Game"
 import { useDrag, DragPreviewImage } from "react-dnd";
 import { isAvaibleMove } from "./Game";
@@ -39,7 +39,7 @@ const PieceContainer = styled.div`
   }
 `;
 
-const Piece = ({ piece, position, moves, setMoves }) => {
+const Piece = ({ piece, position, moves, setMoves}) => {
 
   const pieceIndex = piece && `${piece.type}_${piece.color}`;
   const pieceImg = piece && require(`./assets/${pieceIndex}.png`);
@@ -49,24 +49,26 @@ const Piece = ({ piece, position, moves, setMoves }) => {
       id: piece && `${position}_${piece.type}_${piece.color}`,
     },
     collect: (monitor) => {
+      console.log(monitor.itemID)
       return { isDragging: !!monitor.isDragging() };
-    },
+    }
   });
 
   useEffect(() => {
     isDragging ? setMoves(getAvaibleMoves(position)) : setMoves([]);
   }, [isDragging]);
 
+
   return (
     piece ?
     <>
       <DragPreviewImage connect={preview} src={pieceImg} />
-      <PieceContainer isAvaible={isAvaibleMove(moves, position)} isDragging={isDragging} ref={drag}>
+      <PieceContainer isAvaible={isAvaibleMove(moves, position)} ref={drag}>
         <img src={pieceImg} alt="" />
       </PieceContainer>
     </>
     : 
-    isAvaibleMove(moves, position) && <Container><Circle/></Container>
+    isAvaibleMove(moves, position, isDragging) && <Container><Circle/></Container>
   );
 };
 
