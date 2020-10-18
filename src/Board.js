@@ -3,7 +3,6 @@ import BoardSquare from "./BoardSquare";
 import styled from "styled-components";
 import { isBlack } from "./helpers";
 import { getPosition } from "./helpers";
-import { getAvaibleMoves } from "./Game";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -19,7 +18,6 @@ const SquareContainer = styled.div`
 
 const Board = ({ board }) => {
   const [moves, setMoves] = useState([]);
-
   return (
     <BoardContainer>
       {board.flat().map((piece, i) => (

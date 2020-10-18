@@ -49,7 +49,6 @@ const Piece = ({ piece, position, moves, setMoves}) => {
       id: piece && `${position}_${piece.type}_${piece.color}`,
     },
     collect: (monitor) => {
-      console.log(monitor.itemID)
       return { isDragging: !!monitor.isDragging() };
     }
   });

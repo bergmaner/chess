@@ -1,11 +1,14 @@
 import * as Chess from "chess.js";
 import { BehaviorSubject } from "rxjs";
 
-let promotion = "rnb2bnr/pppPkppp/8/4p3/7q/8/PPPP1PPP/RNBQKBNR w KQ - 1 5";
-
-const chess = new Chess(promotion);
+const chess = new Chess();
 
 export const gameSubject = new BehaviorSubject();
+
+export const resetGame = () => {
+  chess.reset();
+  updateGame();
+};
 
 export const getPromotions = () => {
   return chess.moves({ verbose: true }).filter((move) => move.promotion);
@@ -32,6 +35,7 @@ export const move = (from, to, promotion) => {
   if (promotion) tempMove.promotion = promotion;
 
   const legalMove = chess.move(tempMove);
+  console.log(legalMove, "legal");
 
   if (legalMove) {
     updateGame();
@@ -43,12 +47,50 @@ const getCurrentTurn = () => {
   return "b";
 };
 
+const getCaptured = () => {
+  const history = chess.history({ verbose: true });
+  const initial = [];
+
+  var captured = history.reduce((acc, move) => {
+    if ("captured" in move) {
+      const piece = move.captured;
+      const color = move.color == "w" ? "b" : "w";
+      acc.push({ color, piece });
+      return acc;
+    } else {
+      return acc;
+    }
+  }, initial);
+
+  return captured;
+};
+
 const updateGame = (promotion) => {
+  const isGameOver = chess.game_over();
+
   const newGame = {
     board: chess.board(),
     promotion,
+    isGameOver,
+    result: isGameOver ? getResult() : null,
+    turn: getCurrentTurn(),
+    captured: getCaptured(),
   };
   gameSubject.next(newGame);
+};
+
+const getResult = () => {
+  if (chess.in_checkmate()) {
+    const winner = getCurrentTurn() === "b" ? "WHITE" : "BLACK";
+    return `WINNER - ${winner} - CHECKMATE`;
+  } else if (chess.in_draw()) {
+    let reason = "50 MOVES";
+    if (chess.in_stalemate()) reason = "STALEMATE";
+    else if (chess.in_threefold_repetition()) reason = "REPETITION";
+    else if (chess.insufficent_material()) reason = "INSUFFICENT MATERIAL";
+    return `DRAW - ${reason}`;
+  }
+  return "UNKNOWN METHOD";
 };
 
 export const initGame = () => {
@@ -68,7 +110,7 @@ export const isAvaibleMove = (moves, position) => {
     moves.forEach((move) => {
       let tempMove = move;
 
-      if (tempMove.lastIndexOf("+") !== -1)
+      if (tempMove.lastIndexOf("+") !== -1 || tempMove.lastIndexOf("#") !== -1)
         tempMove = tempMove.substring(tempMove.length - 3, tempMove.length - 1);
       else if (
         tempMove.length > 2 &&
